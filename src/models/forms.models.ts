@@ -14,7 +14,10 @@ export class Form extends Document{
     email: string;
 
     @Prop({required: true})
-    message: string;
+    cidade: string;
+    
+    @Prop({required: true})
+    estado: string;
 
     @Prop({required: true})
     phone: string;

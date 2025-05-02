@@ -9,7 +9,7 @@ export class Pets extends Document{
     @Prop({required: true})
     name: string;
     @Prop({required: true})
-    Breed: string;
+    breed: string;
     @Prop({required: true})
     Gender: string;
     @Prop({required: true})

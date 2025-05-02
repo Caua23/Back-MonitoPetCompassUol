@@ -1,18 +1,47 @@
-import { Controller, Get } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { ApiAcceptedResponse, ApiResponse, ApiOperation } from "@nestjs/swagger";
+import { isValidObjectId } from "mongoose";
+import { CreatePetDto } from "src/dto/create.pet.dto";
 import { PetService } from "src/services/pet.services";
 
 @Controller('pet')
-export class controllerPetModule {
-    constructor(private readonly petService: PetService) {}
+export class PetController {  
+  constructor(private readonly petService: PetService) {}
 
-    @Get('getAll')
-    async getAllPet() {
-        const pets = await this.petService.findAll();
-        return pets;
+  @ApiOperation({ summary: 'Get all pets' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched all pets' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Get('getAll')
+  async getAllPet() {
+    const pets = await this.petService.findAll();
+    return pets;
+  }
+
+  @ApiOperation({ summary: 'Get pet by id' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched pet' })
+  @ApiResponse({ status: 400, description: 'Invalid id' })
+  @ApiResponse({ status: 404, description: 'Pet not found' })
+  @Get('get/:id')
+  async getPetById(@Param('id') id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid id format');
     }
-    @Get('get/:id')
-    async getPetById(id: string) {
-        const pet = await this.petService.findById(id);
-        return pet;
+    const pet = await this.petService.findById(id);
+    if (!pet) {
+      throw new BadRequestException('Pet not found');
     }
+    return pet;
+  }
+
+  @ApiOperation({ summary: 'Create a new pet' })
+  @ApiResponse({ status: 201, description: 'Pet successfully created' })
+  @ApiResponse({ status: 400, description: 'Invalid pet data or files' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Post('create')
+  @UseInterceptors(FilesInterceptor('files', 5))
+  async createPet(@Body() petBody: CreatePetDto, @UploadedFiles() files: Express.Multer.File[]) {
+    const pet = await this.petService.createPet(petBody, files);
+    return pet;
+  }
 }

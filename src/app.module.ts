@@ -10,6 +10,7 @@ import { UserService } from './services/user.services';
 import { FormSchema } from './models/forms.models';
 import { PetSchema } from './models/pets.models';
 import { UserSchema } from './models/users.models';
+import { ImgSchema } from './models/imgs.models';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserSchema } from './models/users.models';
       { name: 'Form', schema: FormSchema },
       { name: 'Pet', schema: PetSchema },
       { name: 'User', schema: UserSchema },
+      { name: 'Img', schema: ImgSchema }, 
     ]),
 
   ],

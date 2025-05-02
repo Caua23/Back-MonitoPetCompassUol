@@ -43,7 +43,7 @@ export class UserService {
             if (!userModel) return HttpException.createBody('Email or password is incorrect', 'Bad Request', HttpStatus.BAD_REQUEST);
 
             const PasswordValid = await argon2.verify(userModel.password, user.password);
-            if (!PasswordValid) return HttpException.createBody('Email or password is incorrect', 'Bad Request', HttpStatus.BAD_REQUEST);
+            if (!PasswordValid) return HttpException.createBody(401, 'Email or password is incorrect', HttpStatus.UNAUTHORIZED);
             
             const { password, ...userResponseBody } = userModel.toJSON();
             return {
