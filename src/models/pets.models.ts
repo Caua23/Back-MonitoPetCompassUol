@@ -11,22 +11,30 @@ export class Pets extends Document{
     @Prop({required: true})
     breed: string;
     @Prop({required: true})
-    Gender: string;
+    gender: string;
     @Prop({required: true})
     age: number;
     @Prop({required: true})
-    Size: number;
+    size: number;
     @Prop({required: true})
-    Color: string;
+    color: string;
     @Prop({default: false})
-    AddInformation: string;
+    addInformation: string;
     @Prop({required: true})
-    Image: string;
+    price: number;
     @Prop({required: true})
-    Price: number;
-    @Prop({required: true})
-    Location: string;
+    location: string;
     
 }
 
 export const PetSchema = SchemaFactory.createForClass(Pets);
+
+PetSchema.virtual('imgs', {
+    ref: 'Img',           
+    localField: '_id',    
+    foreignField: 'pet',  
+  });
+  
+
+  PetSchema.set('toObject', { virtuals: true });
+  PetSchema.set('toJSON', { virtuals: true });

@@ -31,10 +31,6 @@ export class CreatePetDto {
   @IsOptional() 
   addInformation?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  image: string;
-
   @IsNumber()
   @IsNotEmpty()
   price: number;

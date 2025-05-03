@@ -5,6 +5,9 @@ import { Schema as MongooseSchema } from 'mongoose';
 @Schema()
 export class Img {
     @Prop({ required: true })
+    originalName: string;
+    
+    @Prop({ required: true })
     name: string;
 
     @Prop({ required: true })
