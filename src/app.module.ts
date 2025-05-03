@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { controllerFormModule } from './controller/form.controller';
-import { controllerPetModule } from './controller/pet.controller';
-import { controllerUserModule } from './controller/user.controller';
+import { FormController } from './controller/form.controller';
+import { PetController } from './controller/pet.controller';
+import { UserController } from './controller/user.controller';
 import { FormService } from './services/form.services';
 import { PetService } from './services/pet.services';
 import { UserService } from './services/user.services';
@@ -29,9 +29,9 @@ import { ImgSchema } from './models/imgs.models';
 
   ],
   controllers: [
-    controllerFormModule,
-    controllerPetModule,
-    controllerUserModule
+    FormController,
+    PetController,
+    UserController
   ],
   providers: [
     FormService,

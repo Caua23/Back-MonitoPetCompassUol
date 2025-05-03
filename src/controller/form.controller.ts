@@ -4,7 +4,7 @@ import { CreateFormDto } from "src/dto/create.form.dto";
 import { FormService } from "src/services/form.services";
 
 @Controller('form')
-export class controllerFormModule {
+export class FormController {
     constructor(private readonly formService: FormService) {}
     @ApiAcceptedResponse({ description: 'Form submitted successfully' })
     @ApiResponse({ status: 201, description: 'Form created successfully' })

@@ -2,6 +2,7 @@ import { BadRequestException, Body, Controller, Get, Param, Post, UploadedFiles,
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { ApiAcceptedResponse, ApiResponse, ApiOperation } from "@nestjs/swagger";
 import { isValidObjectId } from "mongoose";
+import { multerConfig } from "src/config/multer/multer";
 import { CreatePetDto } from "src/dto/create.pet.dto";
 import { PetService } from "src/services/pet.services";
 
@@ -16,7 +17,7 @@ export class PetController {
   async getAllPet() {
     const pets = await this.petService.findAll();
     return pets;
-  }
+  } 
 
   @ApiOperation({ summary: 'Get pet by id' })
   @ApiResponse({ status: 200, description: 'Successfully fetched pet' })
@@ -39,8 +40,8 @@ export class PetController {
   @ApiResponse({ status: 400, description: 'Invalid pet data or files' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @Post('create')
-  @UseInterceptors(FilesInterceptor('files', 5))
-  async createPet(@Body() petBody: CreatePetDto, @UploadedFiles() files: Express.Multer.File[]) {
+  @UseInterceptors(FilesInterceptor('files', 5, multerConfig))
+  async createPet(@Body() petBody: CreatePetDto, @UploadedFiles() files: Express.MulterS3.File[]) {
     const pet = await this.petService.createPet(petBody, files);
     return pet;
   }
