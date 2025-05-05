@@ -1,6 +1,7 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {  Document, HydratedDocument } from 'mongoose';
+import { Email } from './Email';
 
 export type PetsDocument = HydratedDocument<User>;
 
@@ -10,7 +11,7 @@ export class User extends Document{
     name: string;
     
     @Prop({unique: true})
-    email: string;
+    email: Email;
 
     @Prop({required: true, select: false})
     password: string;
