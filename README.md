@@ -50,3 +50,5 @@ O projeto estará disponível em `http://localhost:3000`.
 * **AWS S3** (opcional)
 
 ---
+![alt](./diagram.png)
+---
