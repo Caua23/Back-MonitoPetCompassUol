@@ -15,9 +15,10 @@ export class CreatePetDto {
   @IsNotEmpty()
   gender: string;
 
-  @IsNumber()
+  // @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  age: number;
+  age: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -38,4 +39,8 @@ export class CreatePetDto {
   @IsString()
   @IsNotEmpty()
   location: string;
+  
+  @IsString()
+  @IsNotEmpty()
+  category: 'dog' | 'cat';
 }

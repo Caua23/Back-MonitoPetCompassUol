@@ -5,52 +5,86 @@ import { Model } from "mongoose";
 import { CreatePetDto } from "src/dto/create.pet.dto";
 import { Img } from "src/models/imgs.models";
 
+
+
 @Injectable()
 export class PetService {
-    constructor(
-        @InjectModel('Pet') private petModel: Model<Pets>,
-        @InjectModel('Img') private imgModel: Model<Img>
-    ) { }
+  constructor(
+    @InjectModel('Pet') private petModel: Model<Pets>,
+    @InjectModel('Img') private imgModel: Model<Img>
+  ) { }
 
-    async findAll(): Promise<Pets[]> {
+  async findAll(
+    limit?: number,
+    gender?: string,
+    color?: string,
+    priceMin?: string,
+    priceMax?: string,
+    size?: string
+  ): Promise<Pets[]> {
 
-        return await this.petModel.find().populate('imgs').exec();
+    const filters: { [key: string]: any }[] = [];
+
+    if (gender) filters.push({ gender });
+    if (color) filters.push({ color });
+    if (size) filters.push({ size });
+    if (priceMin) filters.push({ price: { $gte: Number(priceMin) } });
+    if (priceMax) filters.push({ price: { $lte: Number(priceMax) } });
+
+    const query = this.petModel.find();
+
+    if (filters.length > 0) {
+      query.or(filters);
     }
 
-    async findById(id: string): Promise<Pets | null> {
-        if (!id) {
-            return null;
-        }
-        return await this.petModel.findById(id).populate('imgs').exec();
+    if (limit && limit > 0) {
+      query.limit(limit);
     }
 
-    async createPet(createPetDto: CreatePetDto, files: Express.MulterS3.File[]): Promise<any> {
-        try {
-            if (!files || files.length === 0)
-                throw new BadRequestException('No files uploaded');
-            if (!createPetDto)
-                throw new BadRequestException('Invalid pet data');
-            const pet = await this.petModel.create(createPetDto);
-            let storageType = process.env.STORAGE_TYPE;
-            if (!storageType)
-                storageType = 'local';
-            const imgDocs = files.map(file => ({
-                originalName: file.originalname,
-                name: storageType === 's3' ? file.key : file.filename,
-                url: storageType === 's3' ? file.location : `tmp/uploads/${file.filename}`,
-                size: file.size,
-                pet: pet._id,
-            }));
-            await this.imgModel.insertMany(imgDocs);
-            return {
-                message: 'Pet created successfully',
-                statusCode: HttpStatus.CREATED,
-                redirect: '/pets',
-                data: { Pet: pet, Img: imgDocs },
-            };
-        } catch (error) {
-            console.error(error);
-            throw new InternalServerErrorException(error);
-        }
+    return await query
+      .populate('imgs')
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+
+  async findById(id: string): Promise<Pets | null> {
+    if (!id) {
+      throw new BadRequestException('Invalid ID');
     }
+    return await this.petModel.findById(id).populate('imgs').exec();
+  }
+
+  async createPet(createPetDto: CreatePetDto, files: Express.MulterS3.File[]): Promise<any> {
+    try {
+      if (!files || files.length === 0)
+        throw new BadRequestException('No files uploaded');
+      if (!createPetDto)
+        throw new BadRequestException('Invalid pet data');
+
+      const pet = await this.petModel.create(createPetDto);
+
+      const storageType = process.env.STORAGE_TYPE || 'local';
+
+      const imgDocs = files.map(file => ({
+        originalName: file.originalname,
+        name: storageType === 's3' ? file.key : file.filename,
+        url: storageType === 's3' ? file.location : `http://localhost:3000/src/tmp/uploads/${file.filename}`,
+        size: file.size,
+        pet: pet._id,
+      }));
+
+      await this.imgModel.insertMany(imgDocs);
+
+      return {
+        message: 'Pet created successfully',
+        statusCode: HttpStatus.CREATED,
+        redirect: '/pets',
+        data: { Pet: pet, Img: imgDocs },
+      };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Error creating pet: ' + error.message);
+    }
+  }
 }
