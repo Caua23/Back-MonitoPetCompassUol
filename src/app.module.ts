@@ -11,6 +11,10 @@ import { FormSchema } from './models/forms.models';
 import { PetSchema } from './models/pets.models';
 import { UserSchema } from './models/users.models';
 import { ImgSchema } from './models/imgs.models';
+import { ProductSchema } from './models/products.models';
+import { ImgProductSchema } from './models/imgsProducts.models';
+import { ProductsController } from './controller/products.controller';
+import { ProductsService } from './services/products.services';
 
 @Module({
   imports: [
@@ -25,18 +29,22 @@ import { ImgSchema } from './models/imgs.models';
       { name: 'Pet', schema: PetSchema },
       { name: 'User', schema: UserSchema },
       { name: 'Img', schema: ImgSchema }, 
+      {name: 'Product', schema: ProductSchema},
+      {name: 'ImgProduct', schema: ImgProductSchema}
     ]),
 
   ],
   controllers: [
     FormController,
     PetController,
-    UserController
+    UserController,
+    ProductsController
   ],
   providers: [
     FormService,
     PetService,
-    UserService
+    UserService,
+    ProductsService
   ],
 })
 export class AppModule {}
