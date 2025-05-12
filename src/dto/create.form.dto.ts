@@ -19,6 +19,14 @@ export class CreateFormDto {
     @IsNotEmpty()
     phone: string;
 
+    @IsNotEmpty()
+    @IsString()
+    cidade: string;
+
+    @IsNotEmpty()
+    @IsString()
+    estado: string;
+
     @IsMongoId()
     @IsNotEmpty()
     pet: string; 
