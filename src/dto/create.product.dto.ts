@@ -6,11 +6,11 @@ export class CreateProductDto {
   @IsNotEmpty()
   name: string;
 
-  // @IsNumber()
-  // @Min(0)
-  @IsString()
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
   @IsNotEmpty()
-  price: string;
+  price: number;
 
   @IsString()
   @IsNotEmpty()
