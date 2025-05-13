@@ -8,15 +8,20 @@ import { ProductsService } from "src/services/products.services";
 @ApiTags('Products')
 @Controller('products')
 export class ProductsController {
-    constructor(private readonly productsService: ProductsService) {}
+    constructor(private readonly productsService: ProductsService) { }
 
     @ApiOperation({ summary: 'Get all products' })
     @ApiResponse({ status: 200, description: 'Returns all products or an empty array if none' })
     @Get('/getAll')
-    async getAllProducts(@Query('limit') limit = 10) {
+    async getAllProducts(
+        @Query('limit') limit = 10,
+        @Query('priceMin') priceMin?: string,
+        @Query('priceMax') priceMax?: string
+    ) {
         limit = Math.max(1, Number(limit));
-        return this.productsService.findAll(limit);
+        return this.productsService.findAll(limit, priceMin, priceMax);
     }
+
 
     @ApiOperation({ summary: 'Get product by ID' })
     @ApiResponse({ status: 200, description: 'Returns the product with the given ID' })
@@ -30,7 +35,7 @@ export class ProductsController {
     @ApiResponse({ status: 201, description: 'Product successfully created' })
     @ApiResponse({ status: 400, description: 'Invalid product data or files' })
     @ApiResponse({ status: 500, description: 'Internal server error' })
-    @UseInterceptors(FilesInterceptor('files', 5, multerConfig))
+    @UseInterceptors(FilesInterceptor('files', 8, multerConfig))
     @Post('/create')
     async createProduct(
         @Body(new ValidationPipe({ transform: true })) productBody: CreateProductDto,

@@ -3,6 +3,7 @@ import { ProductsService } from './products.services';
 import { getModelToken } from '@nestjs/mongoose';
 import { Product } from 'src/models/products.models';
 import { ImgProduct } from 'src/models/imgsProducts.models';
+import { CreateProductDto } from 'src/dto/create.product.dto';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -52,7 +53,7 @@ describe('ProductsService', () => {
   });
 
   it('should create a product', async () => {
-    const dto = { name: 'Test', price: 99.9, description: 'desc' };
+    const dto = { name: 'Test', price: 99.9, addInformation: 'test', product: 'food', size: 1 } as CreateProductDto;
     const result = await service.create(dto, [{ originalname: 'image.jpg', filename: 'image.jpg', size: 500, key: 'image-key' }] as Express.MulterS3.File[] );
     expect(result).toEqual({ name: 'Test' });
     expect(productModel.create).toHaveBeenCalledWith(dto);

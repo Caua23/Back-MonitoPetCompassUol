@@ -51,4 +51,5 @@ export class CreatePetDto {
   @IsNotEmpty()
   @Transform(({ value }) => value?.toLowerCase())
   category: 'dog' | 'cat';
+
 }

@@ -13,24 +13,38 @@ export class PetService {
     @InjectModel('Pet') private petModel: Model<Pets>,
     @InjectModel('Img') private imgModel: Model<Img>
   ) { }
-  async findAll(
-    limit?: number,
-    gender?: string,
-    color?: string,
-    priceMin?: string,
-    priceMax?: string,
-    size?: string
-  ): Promise<Pets[]> {
-    const filters: { [key: string]: any } = {};
-    if (gender) filters['gender'] = gender;
-    if (color) filters['color'] = color;
-    if (priceMin) filters['price'] = { ...filters['price'], $gte: Number(priceMin) };
-    if (priceMax) filters['price'] = { ...filters['price'], $lte: Number(priceMax) };
-    if (size) {
+async findAll(
+  limit?: number,
+  gender?: string,
+  color?: string,
+  priceMin?: string,
+  priceMax?: string,
+  size?: string
+): Promise<Pets[]> {
+  const filters: { [key: string]: any } = {};
+
+  
+  if (priceMin || priceMax) {
+    filters['price'] = {};
+    if (priceMin) {
+      const min = Number(priceMin);
+      if (isNaN(min)) throw new Error('Invalid priceMin');
+      filters['price'].$gte = min;
+    }
+    if (priceMax) {
+      const max = Number(priceMax);
+      if (isNaN(max)) throw new Error('Invalid priceMax');
+      filters['price'].$lte = max;
+    }
+  }
+
+  if (gender) filters['gender'] = gender;
+  if (color) filters['color'] = color;
+  if (size) {
       let sizeRange;
       switch (size.toLowerCase()) {
         case 'small':
-          sizeRange = { $gte: 30, $lte: 60 };
+          sizeRange = { $gte: 0, $lte: 60 };
           break;
         case 'medium':
           sizeRange = { $gte: 61, $lte: 120 };
@@ -44,17 +58,15 @@ export class PetService {
       }
       if (Object.keys(sizeRange).length > 0) filters['size'] = sizeRange;
     }
-    const query = this.petModel.find(filters);
-    if (limit && limit > 0) query.limit(limit);
 
+  const query = this.petModel.find(filters);
+  if (limit && limit > 0) query.limit(limit);
 
-    return await query
-      .populate('imgs')
-      .sort({ createdAt: -1 })
-      .exec();
-  }
-
-
+  return await query
+    .populate('imgs')
+    .sort({ createdAt: -1 })
+    .exec();
+}
   async findById(id: string): Promise<Pets | null> {
     if (!id) {
       throw new BadRequestException('Invalid ID');
