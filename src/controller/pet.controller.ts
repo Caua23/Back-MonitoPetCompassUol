@@ -49,7 +49,7 @@ export class PetController {
   @ApiResponse({ status: 400, description: 'Invalid pet data or files' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @Post('create')
-  @UseInterceptors(FilesInterceptor('files', 5, multerConfig))
+  @UseInterceptors(FilesInterceptor('files', 8, multerConfig))
   async createPet(
     @Body() petBody: CreatePetDto,
     @UploadedFiles() files: Express.MulterS3.File[]

@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsNumber, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateProductDto {
   @IsString()
@@ -14,5 +14,16 @@ export class CreateProductDto {
 
   @IsString()
   @IsNotEmpty()
-  description: string;
+  addInformation: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.toLowerCase())
+  product: 'food' | 'toy' | 'costume';
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsNotEmpty()
+  size: number;
 }
