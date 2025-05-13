@@ -1,7 +1,6 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Double, HydratedDocument, Types } from 'mongoose';
-import { Email } from './Email';
 
 export type PetsDocument = HydratedDocument<Form>;
 
@@ -12,7 +11,7 @@ export class Form extends Document{
     name: string;
 
     @Prop({required: true})
-    email: Email;
+    email: string;
 
     @Prop({required: true})
     cidade: string;

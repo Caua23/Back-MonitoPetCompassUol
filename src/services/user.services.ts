@@ -1,5 +1,5 @@
 import { LoginUserDto } from './../dto/login.user.dto';
-import { BadRequestException, Body, Injectable, InternalServerErrorException, HttpStatus } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, HttpStatus } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User } from "src/models/users.models";
@@ -12,13 +12,13 @@ export class UserService {
 
     async CreateUser(user: CreateUserDto): Promise<any> {
         try {
-            if (!user || !user.email || !user.password) 
+            if (!user || !user.email || !user.password)
                 throw new BadRequestException('Email and password are required');
             
-
             const existingUser = await this.userModel.findOne({ email: user.email.toLowerCase() });
-            if (existingUser) 
+            if (existingUser)
                 throw new BadRequestException('Email already exists');
+            
             
             const passwordEncrypted = await argon2.hash(user.password);
             const newUser = new this.userModel({
@@ -33,41 +33,44 @@ export class UserService {
             return {
                 message: 'User created successfully',
                 statusCode: HttpStatus.CREATED,
-                redirect: '/user',
+                redirect: '/user/' + savedUser._id,
                 data: userResponseBody,
-            };      
+            };
         } catch (error) {
             console.error(error);
-            throw new InternalServerErrorException(error);
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('An unexpected error occurred');
         }
     }
 
     async loginUser(user: LoginUserDto): Promise<any> {
         try {
-            if (!user.email || !user.password) 
+            if (!user.email || !user.password)
                 throw new BadRequestException('Email and password are required');
-            
-
-            const userModel = await this.userModel.findOne({ email: user.email.toLowerCase() });
-            if (!userModel) 
+            console.log('usuário:', user);
+            const userModel = await this.userModel.findOne({ email: user.email });
+            if (!userModel)
                 throw new BadRequestException('Email or password is incorrect');
-            
+            console.log('userModel:', userModel);
 
-            const passwordValid = await argon2.verify(userModel.password, user.password);
-            if (!passwordValid) 
-                throw new BadRequestException('Email or password is incorrect');
-            
-
+            if (userModel) {
+                const passwordValid = await argon2.verify(userModel.password, user.password);
+            }
             const { password, ...userResponseBody } = userModel.toJSON();
 
             return {
                 message: 'Login successfully',
                 statusCode: HttpStatus.OK,
-                redirect: '/user',
+                redirect: '/user/' + userResponseBody._id,
                 data: userResponseBody,
             };
         } catch (error) {
             console.error(error);
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
             throw new InternalServerErrorException('An unexpected error occurred');
         }
     }
