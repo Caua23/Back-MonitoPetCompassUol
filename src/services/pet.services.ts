@@ -13,7 +13,6 @@ export class PetService {
     @InjectModel('Pet') private petModel: Model<Pets>,
     @InjectModel('Img') private imgModel: Model<Img>
   ) { }
-
   async findAll(
     limit?: number,
     gender?: string,
@@ -22,24 +21,32 @@ export class PetService {
     priceMax?: string,
     size?: string
   ): Promise<Pets[]> {
-
-    const filters: { [key: string]: any }[] = [];
-
-    if (gender) filters.push({ gender });
-    if (color) filters.push({ color });
-    if (size) filters.push({ size });
-    if (priceMin) filters.push({ price: { $gte: Number(priceMin) } });
-    if (priceMax) filters.push({ price: { $lte: Number(priceMax) } });
-
-    const query = this.petModel.find();
-
-    if (filters.length > 0) {
-      query.or(filters);
+    const filters: { [key: string]: any } = {};
+    if (gender) filters['gender'] = gender;
+    if (color) filters['color'] = color;
+    if (priceMin) filters['price'] = { ...filters['price'], $gte: Number(priceMin) };
+    if (priceMax) filters['price'] = { ...filters['price'], $lte: Number(priceMax) };
+    if (size) {
+      let sizeRange;
+      switch (size.toLowerCase()) {
+        case 'small':
+          sizeRange = { $gte: 30, $lte: 60 };
+          break;
+        case 'medium':
+          sizeRange = { $gte: 61, $lte: 120 };
+          break;
+        case 'large':
+          sizeRange = { $gte: 121 };
+          break;
+        default:
+          sizeRange = {};
+          break;
+      }
+      if (Object.keys(sizeRange).length > 0) filters['size'] = sizeRange;
     }
+    const query = this.petModel.find(filters);
+    if (limit && limit > 0) query.limit(limit);
 
-    if (limit && limit > 0) {
-      query.limit(limit);
-    }
 
     return await query
       .populate('imgs')
@@ -84,7 +91,12 @@ export class PetService {
       };
     } catch (error) {
       console.error(error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException('Error creating pet: ' + error.message);
     }
+
   }
+
 }

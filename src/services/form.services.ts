@@ -6,18 +6,18 @@ import { Form } from "src/models/forms.models";
 
 @Injectable()
 export class FormService {
-    constructor(@InjectModel('Form') private formModel: Model<Form>) {}
+    constructor(@InjectModel('Form') private formModel: Model<Form>) { }
 
     async CreateForm(form: CreateFormDto): Promise<any> {
         try {
             const userExists = await this.formModel.findOne({ email: form.email.toLowerCase() });
-            if (userExists) 
+            if (userExists)
                 throw new BadRequestException("User already exists with this email.");
-            
 
-            if (form.pet == null) 
+
+            if (form.pet == null || form.pet == undefined || form.pet == "")
                 throw new BadRequestException("Id of Pet is required.");
-            
+
 
             const newForm = new this.formModel(form);
             const savedForm = await newForm.save();
@@ -30,6 +30,9 @@ export class FormService {
             };
         } catch (error) {
             console.error(error);
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
             throw new InternalServerErrorException('Error creating form: ' + error.message);
         }
     }
@@ -40,7 +43,7 @@ export class FormService {
 
     async getFormById(id: string): Promise<Form> {
         const form = await this.formModel.findById(id).exec();
-        if (!form) 
+        if (!form)
             throw new BadRequestException("Form not found.");
         return form;
     }
