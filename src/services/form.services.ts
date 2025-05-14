@@ -10,11 +10,6 @@ export class FormService {
 
     async CreateForm(form: CreateFormDto): Promise<any> {
         try {
-            const userExists = await this.formModel.findOne({ email: form.email.toLowerCase() });
-            if (!userExists)
-                throw new BadRequestException("User already exists with this email.");
-
-
             if (form.pet == null || form.pet == undefined || form.pet == "")
                 throw new BadRequestException("Id of Pet is required.");
 
