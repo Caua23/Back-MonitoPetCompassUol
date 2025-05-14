@@ -50,7 +50,7 @@ describe('ProductsController', () => {
 
   describe('createProduct', () => {
     it('should create a product successfully', async () => {
-      const createProductDto: CreateProductDto = { name: 'Product 1', price: 100 , description: 'Description 1' };
+      const createProductDto: CreateProductDto = { name: 'Product 1', price: 100 , addInformation: 'Description 1', product: 'food', size: 1 } as CreateProductDto;
       const files: Express.MulterS3.File[] = [];
       const result = await productsController.createProduct(createProductDto, files);
       expect(result).toEqual({});
