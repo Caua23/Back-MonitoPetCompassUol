@@ -23,8 +23,8 @@ npm install
 Crie um arquivo `.env` com as seguintes variáveis:
 
 ```env
-DB_USER = "#" # caso queira usar o de professores o user é Professores
-DB_PASS = "#" # a senha é Compassuol
+DB_USER = "#" 
+DB_PASS = "#"
 FRONTEND_URL = "http://localhost:3001"
 PORT = 3000
 AWS_ACCESS_KEY_ID=your_aws_access_key_id
